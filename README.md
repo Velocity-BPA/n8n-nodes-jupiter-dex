@@ -8,25 +8,25 @@
 >
 > For licensing information, visit https://velobpa.com/licensing or contact licensing@velobpa.com.
 
-This n8n community node integrates Jupiter DEX, Solana's premier decentralized exchange aggregator, providing access to 6 key resources for token swaps, pricing, DeFi operations, and portfolio management with comprehensive market data and automated trading capabilities.
+An n8n community node for Jupiter DEX, Solana's leading decentralized exchange aggregator. This node provides 6 resources enabling comprehensive DeFi operations including price quotes, token swaps, limit orders, and dollar-cost averaging strategies on the Solana blockchain.
 
 ![n8n Community Node](https://img.shields.io/badge/n8n-Community%20Node-blue)
 ![License](https://img.shields.io/badge/license-BSL--1.1-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
-![Solana](https://img.shields.io/badge/Solana-DeFi-purple)
-![Jupiter DEX](https://img.shields.io/badge/Jupiter-DEX-orange)
-![DeFi](https://img.shields.io/badge/DeFi-Trading-green)
+![Solana](https://img.shields.io/badge/Solana-DeFi-9945ff)
+![Jupiter DEX](https://img.shields.io/badge/Jupiter-DEX-00d4aa)
+![Web3](https://img.shields.io/badge/Web3-Trading-orange)
 
 ## Features
 
-- **Token Swap Quotes** - Get real-time pricing and routing for optimal token swaps across Solana DEXs
-- **Market Data Access** - Retrieve current and historical token prices with comprehensive market metrics  
-- **Limit Order Management** - Create, monitor, and manage limit orders with advanced order parameters
-- **DCA Automation** - Set up and control dollar-cost averaging strategies for automated investing
-- **Perpetual Trading** - Access perpetual futures positions with margin trading and risk management
-- **JLP Pool Operations** - Interact with Jupiter Liquidity Provider pools for yield farming and liquidity provision
-- **Multi-DEX Aggregation** - Access liquidity from 20+ Solana DEXs through Jupiter's routing engine
-- **Advanced Analytics** - Track performance metrics, slippage analysis, and trading statistics
+- **Price Quotes** - Get real-time pricing data and optimal routes across multiple Solana DEXs
+- **Token Swaps** - Execute trades with automatic route optimization and slippage protection
+- **Price Monitoring** - Track token prices and market data across Jupiter's aggregated liquidity
+- **Token Information** - Retrieve comprehensive token metadata and market statistics
+- **Limit Orders** - Create and manage conditional orders that execute when price conditions are met
+- **Dollar-Cost Averaging** - Set up automated DCA strategies for systematic token accumulation
+- **Multi-DEX Routing** - Access liquidity from Raydium, Serum, Orca, and other Solana DEXs
+- **MEV Protection** - Built-in protection against maximum extractable value attacks
 
 ## Installation
 
@@ -61,112 +61,110 @@ n8n start
 
 | Field | Description | Required |
 |-------|-------------|----------|
-| API Key | Jupiter DEX API key for authenticated requests and higher rate limits | Yes |
-| Environment | API environment (mainnet-beta, devnet, testnet) | Yes |
-| Wallet Address | Solana wallet public key for trading operations | Yes |
-| Private Key | Wallet private key for transaction signing (encrypted) | Yes |
+| API Key | Jupiter DEX API key for authentication | Yes |
+| Environment | API environment (mainnet-beta, testnet, devnet) | Yes |
+| RPC Endpoint | Custom Solana RPC endpoint (optional) | No |
 
 ## Resources & Operations
 
-### 1. Swap Quotes
+### 1. Quote
 
 | Operation | Description |
 |-----------|-------------|
-| Get Quote | Retrieve optimal swap route and pricing between two tokens |
-| Get Routes | List all available swap routes with detailed path information |
-| Validate Quote | Check quote validity and current market conditions |
-| Compare Routes | Analyze multiple swap paths for best execution |
+| Get Quote | Get price quote and route information for a token swap |
+| Compare Routes | Compare multiple routing options for optimal pricing |
+| Get Route Info | Retrieve detailed information about a specific route |
 
-### 2. Token Prices
-
-| Operation | Description |
-|-----------|-------------|
-| Get Current Price | Fetch real-time token price in USD or SOL |
-| Get Historical Prices | Retrieve price history with customizable time ranges |
-| Get Price Chart | Access OHLCV candlestick data for charting |
-| Compare Prices | Compare token prices across multiple time periods |
-| Get Market Cap | Retrieve market capitalization and trading volume |
-
-### 3. Limit Orders
+### 2. Swap
 
 | Operation | Description |
 |-----------|-------------|
-| Create Order | Place a new limit order with specified parameters |
-| Get Order | Retrieve details of a specific limit order |
-| List Orders | Get all active limit orders for the wallet |
-| Cancel Order | Cancel an existing limit order |
-| Update Order | Modify order parameters like price or size |
-| Get Order History | Retrieve completed and cancelled order history |
+| Execute Swap | Perform a token swap transaction |
+| Get Swap Status | Check the status of a swap transaction |
+| Cancel Swap | Cancel a pending swap transaction |
+| Get Swap History | Retrieve historical swap transactions |
 
-### 4. DCA Orders
+### 3. Price
 
 | Operation | Description |
 |-----------|-------------|
-| Create DCA | Set up a new dollar-cost averaging schedule |
-| Get DCA Status | Check current status and progress of DCA orders |
-| List DCA Orders | Retrieve all active DCA strategies |
-| Update DCA | Modify DCA parameters like frequency or amount |
-| Pause DCA | Temporarily pause DCA execution |
-| Cancel DCA | Permanently stop and cancel DCA strategy |
-| Get DCA History | View historical DCA execution data |
+| Get Current Price | Get current market price for a token |
+| Get Price History | Retrieve historical price data |
+| Get OHLCV Data | Get open, high, low, close, volume data |
+| Compare Prices | Compare prices across different DEXs |
 
-### 5. Perpetual Positions
+### 4. Token
 
 | Operation | Description |
 |-----------|-------------|
-| Open Position | Create a new leveraged perpetual position |
-| Get Position | Retrieve current position details and PnL |
-| List Positions | Get all open perpetual positions |
-| Close Position | Close an existing perpetual position |
-| Adjust Margin | Add or remove margin from positions |
-| Set Stop Loss | Configure stop-loss orders for risk management |
-| Get Funding Rates | Retrieve current and historical funding rates |
+| Get Token Info | Retrieve token metadata and information |
+| List Tokens | Get list of available tokens |
+| Search Tokens | Search for tokens by name or symbol |
+| Get Token Markets | Get market data for a specific token |
 
-### 6. JLP Operations
+### 5. Limit Order
 
 | Operation | Description |
 |-----------|-------------|
-| Add Liquidity | Deposit tokens into Jupiter Liquidity Provider pools |
-| Remove Liquidity | Withdraw liquidity and collect rewards |
-| Get Pool Info | Retrieve pool statistics and current APY |
-| List Pools | Get available JLP pools and their parameters |
-| Claim Rewards | Collect accumulated liquidity provider rewards |
-| Get Position | Check current LP position and earnings |
-| Calculate APY | Estimate annual percentage yield for pools |
+| Create Limit Order | Place a new limit order |
+| Cancel Limit Order | Cancel an existing limit order |
+| Get Order Status | Check the status of a limit order |
+| List Orders | Get all limit orders for an account |
+| Update Order | Modify an existing limit order |
+
+### 6. DCA
+
+| Operation | Description |
+|-----------|-------------|
+| Create DCA Strategy | Set up a new dollar-cost averaging strategy |
+| Get DCA Status | Check the status of a DCA strategy |
+| Update DCA | Modify an existing DCA strategy |
+| Cancel DCA | Stop a DCA strategy |
+| Get DCA History | Retrieve DCA execution history |
 
 ## Usage Examples
 
 ```javascript
-// Get swap quote for SOL to USDC
+// Get a price quote for swapping SOL to USDC
 {
-  "inputToken": "So11111111111111111111111111111111111111112",
-  "outputToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", 
-  "amount": 1000000000,
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "amount": "1000000000",
   "slippageBps": 50
 }
+```
 
-// Create a DCA order for weekly SOL purchases
+```javascript
+// Execute a token swap
 {
-  "inputToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-  "outputToken": "So11111111111111111111111111111111111111112",
-  "amountPerOrder": 100000000,
-  "frequency": "weekly",
-  "totalOrders": 12
+  "route": "{{$node['Get Quote'].json['routes'][0]}}",
+  "userPublicKey": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+  "feeAccount": "{{$node['Get Quote'].json['feeAccount']}}",
+  "computeUnitPriceMicroLamports": 1000
 }
+```
 
-// Get current token price for Jupiter token
+```javascript
+// Create a limit order
 {
-  "tokenAddress": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
-  "currency": "USD",
-  "includeMarketData": true
+  "maker": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "inAmount": "100000000",
+  "outAmount": "2000000000",
+  "expiredAt": 1735689600
 }
+```
 
-// Add liquidity to JLP pool
+```javascript
+// Set up a DCA strategy
 {
-  "poolAddress": "5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq",
-  "tokenAAmount": 1000000000,
-  "tokenBAmount": 50000000,
-  "minLPTokens": 900000000
+  "user": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+  "inToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "outToken": "So11111111111111111111111111111111111111112",
+  "inAmount": "10000000",
+  "cycleSecondsApart": 86400,
+  "minOutAmount": "90000000"
 }
 ```
 
@@ -174,12 +172,12 @@ n8n start
 
 | Error | Description | Solution |
 |-------|-------------|----------|
-| Invalid API Key | Authentication failed with provided API key | Verify API key in credentials and check permissions |
-| Insufficient Balance | Wallet doesn't have enough tokens for operation | Check wallet balance and ensure sufficient funds |
-| Slippage Exceeded | Price moved beyond acceptable slippage tolerance | Increase slippage tolerance or retry with fresh quote |
-| Network Congestion | Solana network is experiencing high traffic | Wait for network conditions to improve or increase fees |
-| Invalid Token Address | Token mint address is not recognized | Verify token address on Solana blockchain explorer |
-| Order Not Found | Specified order ID doesn't exist | Check order ID and ensure it belongs to your wallet |
+| Invalid API Key | Authentication failed with provided API key | Verify API key is correct and active |
+| Insufficient Funds | Wallet has insufficient balance for transaction | Check wallet balance and reduce transaction amount |
+| Route Not Found | No valid routing path found for token pair | Try different token pair or adjust slippage tolerance |
+| Transaction Failed | Swap transaction failed on blockchain | Check network status and retry with higher priority fee |
+| Price Impact Too High | Transaction would cause significant price impact | Reduce transaction size or increase slippage tolerance |
+| Rate Limit Exceeded | API rate limit has been exceeded | Implement delays between requests or upgrade API plan |
 
 ## Development
 
@@ -224,5 +222,5 @@ Contributions are welcome! Please ensure:
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/Velocity-BPA/n8n-nodes-jupiter-dex/issues)
-- **Jupiter API Documentation**: [Jupiter API Docs](https://station.jup.ag/docs/apis)
-- **Jupiter Community**: [Jupiter Discord](https://discord.gg/jup)
+- **Jupiter API Docs**: [docs.jup.ag](https://docs.jup.ag)
+- **Solana Developer Hub**: [solana.com/developers](https://solana.com/developers)
