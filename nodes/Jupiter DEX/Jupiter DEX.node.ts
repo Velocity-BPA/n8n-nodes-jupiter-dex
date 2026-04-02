@@ -41,13 +41,36 @@ export class JupiterDEX implements INodeType {
       },
     ],
     properties: [
-      // Resource selector
       {
         displayName: 'Resource',
         name: 'resource',
         type: 'options',
         noDataExpression: true,
         options: [
+          {
+            name: 'Quote',
+            value: 'quote',
+          },
+          {
+            name: 'Swap',
+            value: 'swap',
+          },
+          {
+            name: 'Price',
+            value: 'price',
+          },
+          {
+            name: 'Token',
+            value: 'token',
+          },
+          {
+            name: 'LimitOrder',
+            value: 'limitOrder',
+          },
+          {
+            name: 'DCA',
+            value: 'dCA',
+          },
           {
             name: 'SwapQuotes',
             value: 'swapQuotes',
@@ -73,9 +96,86 @@ export class JupiterDEX implements INodeType {
             value: 'jlpOperations',
           }
         ],
-        default: 'swapQuotes',
+        default: 'quote',
       },
-      // Operation dropdowns per resource
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['quote'] } },
+  options: [
+    { name: 'Get Quote', value: 'getQuote', description: 'Get swap quote between two tokens', action: 'Get swap quote' },
+    { name: 'Get Quote By Input Amount', value: 'getQuoteByInputAmount', description: 'Get quote specifying exact input amount', action: 'Get quote by input amount' },
+    { name: 'Get Quote By Output Amount', value: 'getQuoteByOutputAmount', description: 'Get quote specifying exact output amount', action: 'Get quote by output amount' }
+  ],
+  default: 'getQuote',
+},
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: { show: { resource: ['swap'] } },
+	options: [
+		{ name: 'Execute Swap', value: 'executeSwap', description: 'Create and execute token swap transaction', action: 'Execute swap' },
+		{ name: 'Get Swap Instructions', value: 'getSwapInstructions', description: 'Get swap instructions without executing', action: 'Get swap instructions' }
+	],
+	default: 'executeSwap',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['price'] } },
+  options: [
+    { name: 'Get Price', value: 'getPrice', description: 'Get current price for tokens', action: 'Get current price for tokens' },
+    { name: 'Get All Prices', value: 'getAllPrices', description: 'Get prices for multiple tokens', action: 'Get prices for multiple tokens' }
+  ],
+  default: 'getPrice',
+},
+{
+	displayName: 'Operation',
+	name: 'operation',
+	type: 'options',
+	noDataExpression: true,
+	displayOptions: { show: { resource: ['token'] } },
+	options: [
+		{ name: 'Get All Tokens', value: 'getAllTokens', description: 'Get list of all supported tokens', action: 'Get all tokens' },
+		{ name: 'Get Program ID to Label', value: 'getProgramIdToLabel', description: 'Get program ID to label mappings', action: 'Get program ID to label mappings' },
+		{ name: 'Get Indexed Route Map', value: 'getIndexedRouteMap', description: 'Get route map for supported token pairs', action: 'Get indexed route map' },
+	],
+	default: 'getAllTokens',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['limitOrder'] } },
+  options: [
+    { name: 'Create Limit Order', value: 'createLimitOrder', description: 'Create a new limit order', action: 'Create limit order' },
+    { name: 'Get Limit Orders', value: 'getLimitOrders', description: 'Get limit orders for user', action: 'Get limit orders' },
+    { name: 'Cancel Limit Order', value: 'cancelLimitOrder', description: 'Cancel existing limit order', action: 'Cancel limit order' },
+    { name: 'Get Limit Order History', value: 'getLimitOrderHistory', description: 'Get limit order history', action: 'Get limit order history' }
+  ],
+  default: 'createLimitOrder',
+},
+{
+  displayName: 'Operation',
+  name: 'operation',
+  type: 'options',
+  noDataExpression: true,
+  displayOptions: { show: { resource: ['dCA'] } },
+  options: [
+    { name: 'Create DCA Order', value: 'createDCA', description: 'Create a new Dollar Cost Averaging order', action: 'Create DCA order' },
+    { name: 'Get DCA Orders', value: 'getDCAOrders', description: 'Get DCA orders for a user', action: 'Get DCA orders' },
+    { name: 'Close DCA Order', value: 'closeDCA', description: 'Close an existing DCA order', action: 'Close DCA order' },
+    { name: 'Get DCA History', value: 'getDCAHistory', description: 'Get DCA order history for a user', action: 'Get DCA history' }
+  ],
+  default: 'createDCA',
+},
 {
   displayName: 'Operation',
   name: 'operation',
@@ -316,7 +416,581 @@ export class JupiterDEX implements INodeType {
   ],
   default: 'getJlpPrice',
 },
-      // Parameter definitions
+{
+  displayName: 'Input Mint',
+  name: 'inputMint',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote', 'getQuoteByInputAmount', 'getQuoteByOutputAmount']
+    }
+  },
+  default: '',
+  description: 'The mint address of the input token'
+},
+{
+  displayName: 'Output Mint',
+  name: 'outputMint',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote', 'getQuoteByInputAmount', 'getQuoteByOutputAmount']
+    }
+  },
+  default: '',
+  description: 'The mint address of the output token'
+},
+{
+  displayName: 'Amount',
+  name: 'amount',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: '',
+  description: 'The amount to swap'
+},
+{
+  displayName: 'Input Amount',
+  name: 'inputAmount',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuoteByInputAmount']
+    }
+  },
+  default: '',
+  description: 'The exact input amount to swap'
+},
+{
+  displayName: 'Output Amount',
+  name: 'outputAmount',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuoteByOutputAmount']
+    }
+  },
+  default: '',
+  description: 'The exact output amount to receive'
+},
+{
+  displayName: 'Slippage BPS',
+  name: 'slippageBps',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote', 'getQuoteByInputAmount', 'getQuoteByOutputAmount']
+    }
+  },
+  default: 50,
+  description: 'Slippage tolerance in basis points (e.g., 50 = 0.5%)'
+},
+{
+  displayName: 'Swap Mode',
+  name: 'swapMode',
+  type: 'options',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote', 'getQuoteByInputAmount', 'getQuoteByOutputAmount']
+    }
+  },
+  options: [
+    { name: 'Exact In', value: 'ExactIn' },
+    { name: 'Exact Out', value: 'ExactOut' }
+  ],
+  default: 'ExactIn',
+  description: 'The swap mode to use'
+},
+{
+  displayName: 'Dexes',
+  name: 'dexes',
+  type: 'string',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: '',
+  description: 'Comma-separated list of DEXes to include (optional)'
+},
+{
+  displayName: 'Exclude Dexes',
+  name: 'excludeDexes',
+  type: 'string',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: '',
+  description: 'Comma-separated list of DEXes to exclude (optional)'
+},
+{
+  displayName: 'Restrict Intermediate Tokens',
+  name: 'restrictIntermediateTokens',
+  type: 'boolean',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: false,
+  description: 'Whether to restrict intermediate tokens'
+},
+{
+  displayName: 'Only Direct Routes',
+  name: 'onlyDirectRoutes',
+  type: 'boolean',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: false,
+  description: 'Whether to only use direct routes'
+},
+{
+  displayName: 'As Legacy Transaction',
+  name: 'asLegacyTransaction',
+  type: 'boolean',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: false,
+  description: 'Whether to use legacy transaction format'
+},
+{
+  displayName: 'Platform Fee BPS',
+  name: 'platformFeeBps',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: 0,
+  description: 'Platform fee in basis points'
+},
+{
+  displayName: 'Max Accounts',
+  name: 'maxAccounts',
+  type: 'number',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: 64,
+  description: 'Maximum number of accounts in the transaction'
+},
+{
+  displayName: 'Quote Mint',
+  name: 'quoteMint',
+  type: 'string',
+  displayOptions: {
+    show: {
+      resource: ['quote'],
+      operation: ['getQuote']
+    }
+  },
+  default: '',
+  description: 'Quote mint address (optional)'
+},
+{
+	displayName: 'Quote Response',
+	name: 'quoteResponse',
+	type: 'json',
+	required: true,
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap', 'getSwapInstructions'] } },
+	description: 'The quote response object from a previous quote request',
+	default: '{}',
+},
+{
+	displayName: 'User Public Key',
+	name: 'userPublicKey',
+	type: 'string',
+	required: true,
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap', 'getSwapInstructions'] } },
+	description: 'The public key of the user executing the swap',
+	default: '',
+},
+{
+	displayName: 'Wrap and Unwrap SOL',
+	name: 'wrapAndUnwrapSol',
+	type: 'boolean',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap', 'getSwapInstructions'] } },
+	description: 'Whether to wrap/unwrap SOL in the transaction',
+	default: true,
+},
+{
+	displayName: 'Use Shared Accounts',
+	name: 'useSharedAccounts',
+	type: 'boolean',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap', 'getSwapInstructions'] } },
+	description: 'Whether to use shared accounts for optimization',
+	default: true,
+},
+{
+	displayName: 'Fee Account',
+	name: 'feeAccount',
+	type: 'string',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap', 'getSwapInstructions'] } },
+	description: 'Optional fee account for referral fees',
+	default: '',
+},
+{
+	displayName: 'Compute Unit Price (Micro Lamports)',
+	name: 'computeUnitPriceMicroLamports',
+	type: 'number',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap', 'getSwapInstructions'] } },
+	description: 'Compute unit price in micro lamports for priority fees',
+	default: 0,
+},
+{
+	displayName: 'As Legacy Transaction',
+	name: 'asLegacyTransaction',
+	type: 'boolean',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap'] } },
+	description: 'Whether to create a legacy transaction instead of versioned transaction',
+	default: false,
+},
+{
+	displayName: 'Use Token Ledger',
+	name: 'useTokenLedger',
+	type: 'boolean',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap'] } },
+	description: 'Whether to use token ledger for hardware wallet compatibility',
+	default: false,
+},
+{
+	displayName: 'Destination Token Account',
+	name: 'destinationTokenAccount',
+	type: 'string',
+	displayOptions: { show: { resource: ['swap'], operation: ['executeSwap'] } },
+	description: 'Optional destination token account address',
+	default: '',
+},
+{
+  displayName: 'Token IDs',
+  name: 'ids',
+  type: 'string',
+  required: true,
+  displayOptions: {
+    show: {
+      resource: ['price'],
+      operation: ['getPrice', 'getAllPrices']
+    }
+  },
+  default: '',
+  placeholder: 'So11111111111111111111111112',
+  description: 'Comma-separated list of token mint addresses'
+},
+{
+  displayName: 'VS Token',
+  name: 'vsToken',
+  type: 'string',
+  displayOptions: {
+    show: {
+      resource: ['price'],
+      operation: ['getPrice', 'getAllPrices']
+    }
+  },
+  default: 'USDC',
+  description: 'Token to quote price against (default: USDC)'
+},
+{
+  displayName: 'Show Extra Info',
+  name: 'showExtraInfo',
+  type: 'boolean',
+  displayOptions: {
+    show: {
+      resource: ['price'],
+      operation: ['getPrice', 'getAllPrices']
+    }
+  },
+  default: false,
+  description: 'Whether to include additional token information in the response'
+},
+{
+	displayName: 'Tags',
+	name: 'tags',
+	type: 'string',
+	default: '',
+	placeholder: 'verified,community',
+	description: 'Filter tokens by tags (comma-separated)',
+	displayOptions: {
+		show: {
+			resource: ['token'],
+			operation: ['getAllTokens'],
+		},
+	},
+},
+{
+	displayName: 'Only Direct Routes',
+	name: 'onlyDirectRoutes',
+	type: 'boolean',
+	default: false,
+	description: 'Whether to return only direct routes',
+	displayOptions: {
+		show: {
+			resource: ['token'],
+			operation: ['getIndexedRouteMap'],
+		},
+	},
+},
+{
+	displayName: 'As Legacy Transaction',
+	name: 'asLegacyTransaction',
+	type: 'boolean',
+	default: false,
+	description: 'Whether to format for legacy transactions',
+	displayOptions: {
+		show: {
+			resource: ['token'],
+			operation: ['getIndexedRouteMap'],
+		},
+	},
+},
+{
+  displayName: 'Input Mint',
+  name: 'inputMint',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder'] } },
+  default: '',
+  description: 'The mint address of the input token',
+},
+{
+  displayName: 'Output Mint',
+  name: 'outputMint',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder'] } },
+  default: '',
+  description: 'The mint address of the output token',
+},
+{
+  displayName: 'Input Amount',
+  name: 'inAmount',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder'] } },
+  default: '',
+  description: 'The amount of input tokens (in smallest units)',
+},
+{
+  displayName: 'Output Amount',
+  name: 'outAmount',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder'] } },
+  default: '',
+  description: 'The amount of output tokens expected (in smallest units)',
+},
+{
+  displayName: 'Expired At',
+  name: 'expiredAt',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder'] } },
+  default: '',
+  description: 'Expiration timestamp for the limit order',
+},
+{
+  displayName: 'Base',
+  name: 'base',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder'] } },
+  default: '',
+  description: 'Base address for the limit order',
+},
+{
+  displayName: 'User Public Key',
+  name: 'userPublicKey',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['createLimitOrder', 'cancelLimitOrder'] } },
+  default: '',
+  description: 'The public key of the user placing the order',
+},
+{
+  displayName: 'Wallet',
+  name: 'wallet',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['getLimitOrders', 'getLimitOrderHistory'] } },
+  default: '',
+  description: 'The wallet address to query orders for',
+},
+{
+  displayName: 'Input Mint (Filter)',
+  name: 'inputMintFilter',
+  type: 'string',
+  required: false,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['getLimitOrders'] } },
+  default: '',
+  description: 'Filter by input mint address (optional)',
+},
+{
+  displayName: 'Output Mint (Filter)',
+  name: 'outputMintFilter',
+  type: 'string',
+  required: false,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['getLimitOrders'] } },
+  default: '',
+  description: 'Filter by output mint address (optional)',
+},
+{
+  displayName: 'Order Public Key',
+  name: 'orderPublicKey',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['cancelLimitOrder'] } },
+  default: '',
+  description: 'The public key of the order to cancel',
+},
+{
+  displayName: 'Page',
+  name: 'page',
+  type: 'number',
+  required: false,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['getLimitOrders', 'getLimitOrderHistory'] } },
+  default: 1,
+  description: 'Page number for pagination',
+},
+{
+  displayName: 'Take',
+  name: 'take',
+  type: 'number',
+  required: false,
+  displayOptions: { show: { resource: ['limitOrder'], operation: ['getLimitOrderHistory'] } },
+  default: 10,
+  description: 'Number of records to retrieve per page',
+},
+{
+  displayName: 'User Public Key',
+  name: 'userPublicKey',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA', 'getDCAOrders', 'closeDCA', 'getDCAHistory'] } },
+  default: '',
+  description: 'The public key of the user wallet',
+},
+{
+  displayName: 'Input Mint',
+  name: 'inputMint',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'Token mint address of the input token',
+},
+{
+  displayName: 'Output Mint',
+  name: 'outputMint',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'Token mint address of the output token',
+},
+{
+  displayName: 'Total Amount',
+  name: 'inAmount',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'Total amount of input token to be used for DCA (in smallest unit)',
+},
+{
+  displayName: 'Amount Per Cycle',
+  name: 'inAmountPerCycle',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'Amount of input token to swap per cycle (in smallest unit)',
+},
+{
+  displayName: 'Cycle Frequency',
+  name: 'cycleFrequency',
+  type: 'number',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: 3600,
+  description: 'Frequency of DCA cycles in seconds',
+},
+{
+  displayName: 'Minimum Output Amount Per Cycle',
+  name: 'minOutAmountPerCycle',
+  type: 'string',
+  required: false,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'Minimum amount of output token per cycle (slippage protection)',
+},
+{
+  displayName: 'Maximum Output Amount Per Cycle',
+  name: 'maxOutAmountPerCycle',
+  type: 'string',
+  required: false,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'Maximum amount of output token per cycle',
+},
+{
+  displayName: 'Start Time',
+  name: 'startAt',
+  type: 'dateTime',
+  required: false,
+  displayOptions: { show: { resource: ['dCA'], operation: ['createDCA'] } },
+  default: '',
+  description: 'When to start the DCA order (Unix timestamp)',
+},
+{
+  displayName: 'DCA Public Key',
+  name: 'dcaPublicKey',
+  type: 'string',
+  required: true,
+  displayOptions: { show: { resource: ['dCA'], operation: ['closeDCA'] } },
+  default: '',
+  description: 'The public key of the DCA order to close',
+},
+{
+  displayName: 'Page',
+  name: 'page',
+  type: 'number',
+  required: false,
+  displayOptions: { show: { resource: ['dCA'], operation: ['getDCAOrders', 'getDCAHistory'] } },
+  default: 1,
+  description: 'Page number for pagination',
+},
 {
   displayName: 'Input Mint Address',
   name: 'inputMint',
@@ -1124,6 +1798,18 @@ export class JupiterDEX implements INodeType {
     const resource = this.getNodeParameter('resource', 0) as string;
 
     switch (resource) {
+      case 'quote':
+        return [await executeQuoteOperations.call(this, items)];
+      case 'swap':
+        return [await executeSwapOperations.call(this, items)];
+      case 'price':
+        return [await executePriceOperations.call(this, items)];
+      case 'token':
+        return [await executeTokenOperations.call(this, items)];
+      case 'limitOrder':
+        return [await executeLimitOrderOperations.call(this, items)];
+      case 'dCA':
+        return [await executeDCAOperations.call(this, items)];
       case 'swapQuotes':
         return [await executeSwapQuotesOperations.call(this, items)];
       case 'tokenPrices':
@@ -1146,12 +1832,13 @@ export class JupiterDEX implements INodeType {
 // Resource Handler Functions
 // ============================================================
 
-async function executeSwapQuotesOperations(
+async function executeQuoteOperations(
   this: IExecuteFunctions,
   items: INodeExecutionData[],
 ): Promise<INodeExecutionData[]> {
   const returnData: INodeExecutionData[] = [];
   const operation = this.getNodeParameter('operation', 0) as string;
+  const credentials = await this.getCredentials('jupiterdexApi') as any;
 
   for (let i = 0; i < items.length; i++) {
     try {
@@ -1162,767 +1849,65 @@ async function executeSwapQuotesOperations(
           const inputMint = this.getNodeParameter('inputMint', i) as string;
           const outputMint = this.getNodeParameter('outputMint', i) as string;
           const amount = this.getNodeParameter('amount', i) as string;
-          const slippageBps = this.getNodeParameter('slippageBps', i) as number;
-          const onlyDirectRoutes = this.getNodeParameter('onlyDirectRoutes', i) as boolean;
-          const asLegacyTransaction = this.getNodeParameter('asLegacyTransaction', i) as boolean;
+          const slippageBps = this.getNodeParameter('slippageBps', i, 50) as number;
+          const swapMode = this.getNodeParameter('swapMode', i, 'ExactIn') as string;
+          const dexes = this.getNodeParameter('dexes', i, '') as string;
+          const excludeDexes = this.getNodeParameter('excludeDexes', i, '') as string;
+          const restrictIntermediateTokens = this.getNodeParameter('restrictIntermediateTokens', i, false) as boolean;
+          const onlyDirectRoutes = this.getNodeParameter('onlyDirectRoutes', i, false) as boolean;
+          const asLegacyTransaction = this.getNodeParameter('asLegacyTransaction', i, false) as boolean;
+          const platformFeeBps = this.getNodeParameter('platformFeeBps', i, 0) as number;
+          const maxAccounts = this.getNodeParameter('maxAccounts', i, 64) as number;
+          const quoteMint = this.getNodeParameter('quoteMint', i, '') as string;
 
-          const params: any = {
+          const params = new URLSearchParams({
             inputMint,
             outputMint,
             amount,
             slippageBps: slippageBps.toString(),
-          };
-
-          if (onlyDirectRoutes) {
-            params.onlyDirectRoutes = 'true';
-          }
-
-          if (asLegacyTransaction) {
-            params.asLegacyTransaction = 'true';
-          }
-
-          const queryString = new URLSearchParams(params).toString();
-
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/quote?${queryString}`,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getSwapInstructions': {
-          const quoteResponse = this.getNodeParameter('quoteResponse', i) as any;
-          const userPublicKey = this.getNodeParameter('userPublicKey', i) as string;
-          const wrapAndUnwrapSol = this.getNodeParameter('wrapAndUnwrapSol', i) as boolean;
-          const useSharedAccounts = this.getNodeParameter('useSharedAccounts', i) as boolean;
-          const feeAccount = this.getNodeParameter('feeAccount', i) as string;
-
-          const requestBody: any = {
-            quoteResponse: typeof quoteResponse === 'string' ? JSON.parse(quoteResponse) : quoteResponse,
-            userPublicKey,
-            wrapAndUnwrapSol,
-            useSharedAccounts,
-          };
-
-          if (feeAccount) {
-            requestBody.feeAccount = feeAccount;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/swap-instructions',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'executeSwap': {
-          const swapTransaction = this.getNodeParameter('swapTransaction', i) as string;
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const options = this.getNodeParameter('options', i) as any;
-
-          const requestBody: any = {
-            swapTransaction,
-            wallet,
-            options: typeof options === 'string' ? JSON.parse(options) : options,
-          };
-
-          const httpOptions: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/swap',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(httpOptions) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({
-        json: result,
-        pairedItem: { item: i },
-      });
-
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i },
-        });
-      } else {
-        if (error.response) {
-          throw new NodeApiError(this.getNode(), error.response.body || error.response, {
-            message: error.message,
-            httpCode: error.statusCode?.toString(),
+            swapMode
           });
-        }
-        throw new NodeOperationError(this.getNode(), error.message);
-      }
-    }
-  }
 
-  return returnData;
-}
+          if (dexes) params.append('dexes', dexes);
+          if (excludeDexes) params.append('excludeDexes', excludeDexes);
+          if (restrictIntermediateTokens) params.append('restrictIntermediateTokens', 'true');
+          if (onlyDirectRoutes) params.append('onlyDirectRoutes', 'true');
+          if (asLegacyTransaction) params.append('asLegacyTransaction', 'true');
+          if (platformFeeBps > 0) params.append('platformFeeBps', platformFeeBps.toString());
+          if (maxAccounts !== 64) params.append('maxAccounts', maxAccounts.toString());
+          if (quoteMint) params.append('quoteMint', quoteMint);
 
-async function executeTokenPricesOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-  const baseUrl = 'https://quote-api.jup.ag/v6';
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'getTokenPrice': {
-          const ids = this.getNodeParameter('ids', i) as string;
-          const vsToken = this.getNodeParameter('vsToken', i) as string;
-          
-          if (!ids) {
-            throw new NodeOperationError(this.getNode(), 'Token IDs parameter is required');
-          }
-          
-          const queryParams = new URLSearchParams();
-          queryParams.append('ids', ids);
-          if (vsToken) {
-            queryParams.append('vsToken', vsToken);
-          }
-          
           const options: any = {
             method: 'GET',
-            url: `${baseUrl}/price?${queryParams.toString()}`,
+            url: `${credentials.baseUrl}/quote?${params.toString()}`,
             headers: {
-              'Accept': 'application/json',
+              'Content-Type': 'application/json',
             },
             json: true,
           };
-          
+
           result = await this.helpers.httpRequest(options) as any;
           break;
         }
-        
-        case 'getAllTokens': {
-          const tags = this.getNodeParameter('tags', i) as string;
-          
-          let url = `${baseUrl}/tokens`;
-          if (tags) {
-            const queryParams = new URLSearchParams();
-            queryParams.append('tags', tags);
-            url += `?${queryParams.toString()}`;
-          }
-          
-          const options: any = {
-            method: 'GET',
-            url: url,
-            headers: {
-              'Accept': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getProgramLabels': {
-          const options: any = {
-            method: 'GET',
-            url: `${baseUrl}/program-id-to-label`,
-            headers: {
-              'Accept': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-      
-      returnData.push({ 
-        json: result, 
-        pairedItem: { item: i } 
-      });
-      
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        if (error.httpCode) {
-          throw new NodeApiError(this.getNode(), error);
-        }
-        throw new NodeOperationError(this.getNode(), error.message);
-      }
-    }
-  }
-  
-  return returnData;
-}
 
-async function executeLimitOrdersOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-
-      switch (operation) {
-        case 'createLimitOrder': {
+        case 'getQuoteByInputAmount': {
           const inputMint = this.getNodeParameter('inputMint', i) as string;
           const outputMint = this.getNodeParameter('outputMint', i) as string;
-          const inAmount = this.getNodeParameter('inAmount', i) as number;
-          const outAmount = this.getNodeParameter('outAmount', i) as number;
-          const expiredAt = this.getNodeParameter('expiredAt', i) as string;
-          const base = this.getNodeParameter('base', i) as string;
-
-          const body: any = {
-            inputMint,
-            outputMint,
-            inAmount: inAmount.toString(),
-            outAmount: outAmount.toString(),
-          };
-
-          if (expiredAt) {
-            body.expiredAt = new Date(expiredAt).getTime();
-          }
-
-          if (base) {
-            body.base = base;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/limit-order',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-            body,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getLimitOrder': {
-          const publicKey = this.getNodeParameter('publicKey', i) as string;
-
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/limit-order/${publicKey}`,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getAllLimitOrders': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const inputMint = this.getNodeParameter('inputMint', i) as string;
-          const outputMint = this.getNodeParameter('outputMint', i) as string;
-
-          const params: any = { wallet };
-
-          if (inputMint) {
-            params.inputMint = inputMint;
-          }
-
-          if (outputMint) {
-            params.outputMint = outputMint;
-          }
-
-          const queryString = new URLSearchParams(params).toString();
-
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/limit-orders?${queryString}`,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'cancelLimitOrder': {
-          const limitOrder = this.getNodeParameter('limitOrder', i) as string;
-          const wallet = this.getNodeParameter('wallet', i) as string;
-
-          const body: any = {
-            limitOrder,
-            wallet,
-          };
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/limit-order/cancel',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-            body,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getLimitOrderHistory': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const take = this.getNodeParameter('take', i) as number;
-          const lastCursor = this.getNodeParameter('lastCursor', i) as string;
-
-          const params: any = { wallet };
-
-          if (take) {
-            params.take = take.toString();
-          }
-
-          if (lastCursor) {
-            params.lastCursor = lastCursor;
-          }
-
-          const queryString = new URLSearchParams(params).toString();
-
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/limit-order/history?${queryString}`,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({ json: result, pairedItem: { item: i } });
-
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-
-  return returnData;
-}
-
-async function executeDcaOrdersOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'createDcaOrder': {
-          const inputMint = this.getNodeParameter('inputMint', i) as string;
-          const outputMint = this.getNodeParameter('outputMint', i) as string;
-          const inAmount = this.getNodeParameter('inAmount', i) as number;
-          const inAmountPerCycle = this.getNodeParameter('inAmountPerCycle', i) as number;
-          const cycleSecondsApart = this.getNodeParameter('cycleSecondsApart', i) as number;
-          const minOutAmountPerCycle = this.getNodeParameter('minOutAmountPerCycle', i, 0) as number;
-          const maxOutAmountPerCycle = this.getNodeParameter('maxOutAmountPerCycle', i, 0) as number;
-
-          const body: any = {
-            inputMint,
-            outputMint,
-            inAmount: inAmount.toString(),
-            inAmountPerCycle: inAmountPerCycle.toString(),
-            cycleSecondsApart,
-          };
-
-          if (minOutAmountPerCycle > 0) {
-            body.minOutAmountPerCycle = minOutAmountPerCycle.toString();
-          }
-
-          if (maxOutAmountPerCycle > 0) {
-            body.maxOutAmountPerCycle = maxOutAmountPerCycle.toString();
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/dca',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getDcaOrder': {
-          const publicKey = this.getNodeParameter('publicKey', i) as string;
-
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/dca/${publicKey}`,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getAllDcaOrders': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
-
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/dca`,
-            qs: {
-              wallet,
-            },
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'closeDcaOrder': {
-          const dca = this.getNodeParameter('dca', i) as string;
-          const wallet = this.getNodeParameter('wallet', i) as string;
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/dca/close',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: {
-              dca,
-              wallet,
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getDcaHistory': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const take = this.getNodeParameter('take', i, 50) as number;
-          const lastCursor = this.getNodeParameter('lastCursor', i, '') as string;
-
-          const qs: any = {
-            wallet,
-            take,
-          };
-
-          if (lastCursor) {
-            qs.lastCursor = lastCursor;
-          }
-
-          const options: any = {
-            method: 'GET',
-            url: 'https://quote-api.jup.ag/v6/dca/history',
-            qs,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({ json: result, pairedItem: { item: i } });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ json: { error: error.message }, pairedItem: { item: i } });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-
-  return returnData;
-}
-
-async function executePerpetualPositionsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'getPerpMarkets': {
-          const options: any = {
-            method: 'GET',
-            url: 'https://quote-api.jup.ag/v6/perp/markets',
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'createPerpOrder': {
-          const market = this.getNodeParameter('market', i) as string;
-          const side = this.getNodeParameter('side', i) as string;
-          const size = this.getNodeParameter('size', i) as number;
-          const price = this.getNodeParameter('price', i) as number;
-          const orderType = this.getNodeParameter('orderType', i) as string;
-          const reduceOnly = this.getNodeParameter('reduceOnly', i) as boolean;
-
-          const requestBody: any = {
-            market,
-            side,
-            size,
-            orderType,
-            reduceOnly,
-          };
-
-          if (orderType === 'limit' && price) {
-            requestBody.price = price;
-          }
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/perp/order',
-            body: requestBody,
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getPerpPositions': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const market = this.getNodeParameter('market', i) as string;
-
-          const queryParams: any = { wallet };
-          if (market) {
-            queryParams.market = market;
-          }
-
-          const queryString = new URLSearchParams(queryParams).toString();
-          
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/perp/positions?${queryString}`,
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'getPerpOrders': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const market = this.getNodeParameter('market', i) as string;
-
-          const queryParams: any = { wallet };
-          if (market) {
-            queryParams.market = market;
-          }
-
-          const queryString = new URLSearchParams(queryParams).toString();
-          
-          const options: any = {
-            method: 'GET',
-            url: `https://quote-api.jup.ag/v6/perp/orders?${queryString}`,
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        case 'cancelPerpOrder': {
-          const orderId = this.getNodeParameter('orderId', i) as string;
-          const wallet = this.getNodeParameter('wallet', i) as string;
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/perp/cancel-order',
-            body: {
-              orderId,
-              wallet,
-            },
-            json: true,
-          };
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-        
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-      
-      returnData.push({ json: result, pairedItem: { item: i } });
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({ 
-          json: { error: error.message }, 
-          pairedItem: { item: i } 
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-  
-  return returnData;
-}
-
-async function executeJlpOperationsOperations(
-  this: IExecuteFunctions,
-  items: INodeExecutionData[],
-): Promise<INodeExecutionData[]> {
-  const returnData: INodeExecutionData[] = [];
-  const operation = this.getNodeParameter('operation', 0) as string;
-
-  for (let i = 0; i < items.length; i++) {
-    try {
-      let result: any;
-      
-      switch (operation) {
-        case 'getJlpPrice': {
-          const options: any = {
-            method: 'GET',
-            url: 'https://quote-api.jup.ag/v6/jlp/price',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-          
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'depositToJlp': {
-          const inputMint = this.getNodeParameter('inputMint', i) as string;
-          const amount = this.getNodeParameter('amount', i) as string;
-          const wallet = this.getNodeParameter('wallet', i) as string;
+          const inputAmount = this.getNodeParameter('inputAmount', i) as string;
           const slippageBps = this.getNodeParameter('slippageBps', i, 50) as number;
+          const swapMode = this.getNodeParameter('swapMode', i, 'ExactIn') as string;
 
-          const requestBody: any = {
+          const params = new URLSearchParams({
             inputMint,
-            amount,
-            userPublicKey: wallet,
-            slippageBps,
-          };
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/jlp/deposit',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'withdrawFromJlp': {
-          const amount = this.getNodeParameter('amount', i) as string;
-          const outputMint = this.getNodeParameter('outputMint', i) as string;
-          const wallet = this.getNodeParameter('wallet', i) as string;
-          const slippageBps = this.getNodeParameter('slippageBps', i, 50) as number;
-
-          const requestBody: any = {
-            amount,
             outputMint,
-            userPublicKey: wallet,
-            slippageBps,
-          };
-
-          const options: any = {
-            method: 'POST',
-            url: 'https://quote-api.jup.ag/v6/jlp/withdraw',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        case 'getJlpPositions': {
-          const wallet = this.getNodeParameter('wallet', i) as string;
+            inputAmount,
+            slippageBps: slippageBps.toString(),
+            swapMode
+          });
 
           const options: any = {
             method: 'GET',
-            url: `https://quote-api.jup.ag/v6/jlp/positions?wallet=${encodeURIComponent(wallet)}`,
+            url: `${credentials.baseUrl}/quote-by-input-amount?${params.toString()}`,
             headers: {
               'Content-Type': 'application/json',
             },
@@ -1933,40 +1918,8 @@ async function executeJlpOperationsOperations(
           break;
         }
 
-        case 'getJlpStats': {
-          const options: any = {
-            method: 'GET',
-            url: 'https://quote-api.jup.ag/v6/jlp/stats',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            json: true,
-          };
-
-          result = await this.helpers.httpRequest(options) as any;
-          break;
-        }
-
-        default:
-          throw new NodeOperationError(this.getNode(), `Unknown operation: ${operation}`);
-      }
-
-      returnData.push({
-        json: result,
-        pairedItem: { item: i },
-      });
-
-    } catch (error: any) {
-      if (this.continueOnFail()) {
-        returnData.push({
-          json: { error: error.message },
-          pairedItem: { item: i },
-        });
-      } else {
-        throw new NodeApiError(this.getNode(), error);
-      }
-    }
-  }
-
-  return returnData;
-}
+        case 'getQuoteByOutputAmount': {
+          const inputMint = this.getNodeParameter('inputMint', i) as string;
+          const outputMint = this.getNodeParameter('outputMint', i) as string;
+          const outputAmount = this.getNodeParameter('outputAmount', i) as string;
+          const slippageBps = this.getNodeParameter('slippageB
